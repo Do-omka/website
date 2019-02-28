@@ -9,11 +9,12 @@ const
 	htmlmin = require('gulp-htmlmin'),
 	jsmin = require('gulp-uglify'),
 	// concat = require('gulp-concat'),
-	del = require('del'),
+	// del = require('del'),
 	rigger = require('gulp-rigger'),
 	babel = require('gulp-babel'),
 	bs = require('browser-sync').create(),
-	
+	newer = require('gulp-changed'),
+	// remember = require('gulp-remember'),
 	svgOptions = {
 		plugins: [
 			// {removeViewBox: false},
@@ -101,8 +102,8 @@ function min_js() {
 }
 
 function min_img() {
-	// del(['docs/img'])
-	return gulp.src('dev/img/!(*.inline.svg)')
+	return gulp.src('dev/img/!(*.inline.svg)', {since: gulp.lastRun(min_img)})
+		.pipe(newer('docs/img'))
 		.pipe(imgmin([
 			imgmin.gifsicle(),
 			imgmin.jpegtran(),
@@ -113,7 +114,8 @@ function min_img() {
 }
 
 function min_fonts() {
-	return gulp.src('dev/fonts/*')
+	return gulp.src('dev/fonts/*', {since: gulp.lastRun(min_fonts)})
+		.pipe(newer('docs/fonts'))
 		.pipe(gulp.dest('docs/fonts'))
 }
 
@@ -141,5 +143,4 @@ function refresh() {
 gulp.task('default', gulp.parallel(refresh, watch_html, watch_css, watch_js))
 gulp.task('try', gulp.parallel(html, css, js))
 
-gulp.task('build', gulp.parallel(min_html, min_css, min_js))
-gulp.task('assets', gulp.parallel(min_img, min_fonts))
+gulp.task('build', gulp.parallel(min_html, min_css, min_js, min_fonts, min_img))
