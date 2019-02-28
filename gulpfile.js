@@ -103,7 +103,12 @@ function min_js() {
 function min_img() {
 	// del(['docs/img'])
 	return gulp.src('dev/img/!(*.inline.svg)')
-		.pipe(imgmin(imgmin.svgo(svgOptions)))
+		.pipe(imgmin([
+			imgmin.gifsicle(),
+			imgmin.jpegtran(),
+			imgmin.optipng(),
+			imgmin.svgo(svgOptions)
+			]))
 		.pipe(gulp.dest('docs/img'))
 }
 
